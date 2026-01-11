@@ -1,208 +1,408 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>6-Month Growth Tracker</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6-Month Growth Tracker</title>
 
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'sans-serif']
-          }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif']
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body class="bg-gray-900 text-gray-100 font-inter min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-gray-800 shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <h1 class="text-2xl font-bold text-green-400">
-        🚀 6-Month Fitness & Study Tracker
-      </h1>
-      <p class="text-sm text-gray-400">
-        Jan – June | Gym • Diet • Study • Discipline
-      </p>
-    </div>
-  </header>
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-green-400">
+                    🚀 6-Month Fitness & Study Tracker
+                </h1>
+                <p class="text-sm text-gray-400">
+                    Jan – June | Gym • Diet • Study • Discipline
+                </p>
+            </div>
 
-  <!-- Main -->
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+            <!-- Profile / Progress card -->
+            <div id="profileCard" class="bg-gray-900 border border-gray-700 rounded-lg p-3 flex items-center gap-4">
+                <div class="min-w-[140px]">
+                    <div class="text-xs text-gray-400">Name</div>
+                    <div id="profileName" class="font-semibold text-white">Maddy</div>
+                </div>
 
-<!-- Fixed Schedule -->
-<section>
-  <h2 class="text-xl font-semibold mb-4">🗓️ My Fixed Schedule</h2>
+                <div class="min-w-[120px]">
+                    <div class="text-xs text-gray-400">Current</div>
+                    <div class="font-semibold text-green-400" id="currentWeight">-- kg</div>
+                    <div class="text-xs text-gray-400" id="weightDelta">from --</div>
+                </div>
 
-  <p class="text-gray-400 text-sm mb-2">
-    Editable schedule (stored locally like a text database)
-  </p>
+                <div class="min-w-[140px]">
+                    <div class="text-xs text-gray-400">Goal</div>
+                    <div class="flex items-center gap-2">
+                        <div class="font-semibold" id="goalWeight">-- kg</div>
+                        <button id="editProfileBtn"
+                            class="text-xs px-2 py-1 bg-gray-800 rounded text-gray-300 hover:bg-gray-700">Edit</button>
+                    </div>
+                    <div class="text-xs text-gray-400" id="bmiLabel">BMI: --</div>
+                </div>
 
-  <textarea
-    id="scheduleBox"
-    rows="16"
-    class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500"
-  ></textarea>
+                <div class="flex-1">
+                    <div class="text-xs text-gray-400">Progress to goal</div>
+                    <div class="w-full bg-gray-800 rounded-full h-2 mt-1 overflow-hidden">
+                        <div id="progressBar" class="h-2 bg-green-400 rounded-full" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <div class="mt-3 text-sm text-gray-500">
-    Auto-saved ✔ Changes persist after refresh.
-  </div>
-</section>
+        <!-- Inline edit form (hidden by default) -->
+        <div id="profileEdit" class="max-w-7xl mx-auto px-6 py-3 hidden">
+            <div class="bg-gray-800 p-4 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                <div>
+                    <label class="text-xs text-gray-400">Name</label>
+                    <input id="inpName" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm"
+                        placeholder="Your name" />
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400">Height (cm)</label>
+                    <input id="inpHeight" type="number"
+                        class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm" />
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400">Goal weight (kg)</label>
+                    <input id="inpGoal" type="number"
+                        class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm" />
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="saveProfileBtn"
+                        class="bg-green-500 hover:bg-green-600 text-black px-3 py-1 rounded">Save</button>
+                    <button id="cancelProfileBtn"
+                        class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1 rounded">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </header>
 
 
-    <!-- Daily Habit Tracker -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">📅 Daily Habit Tracker</h2>
+    <!-- Main -->
+    <main class="max-w-8xl mx-auto px-7 py-8 space-y-12">
 
-      <div class="overflow-x-auto">
-        <table class="w-full border border-gray-700 rounded-lg overflow-hidden">
-          <thead class="bg-gray-800 text-gray-300">
-            <tr>
-              <th class="p-3">Date</th>
-              <th class="p-3">Workout</th>
-              <th class="p-3">Calories (~2100)</th>
-              <th class="p-3">Protein (~160g)</th>
-              <th class="p-3">Study</th>
-              <th class="p-3">Sleep ≥7.5h</th>
-            </tr>
-          </thead>
-          <tbody id="dailyTracker" class="divide-y divide-gray-700"></tbody>
-        </table>
+        <!-- Fixed Schedule -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">🗓️ My Fixed Schedule</h2>
+
+            <p class="text-gray-400 text-sm mb-2">
+                Editable schedule (stored locally like a text database)
+            </p>
+
+            <textarea id="scheduleBox" rows="10"
+                class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+            <!-- Timetable view (replaces the previous preview) -->
+            <div id="scheduleTimetableWrap" class="mt-6">
+                <h3 class="text-sm text-gray-400 mb-2">📋 Timetable View</h3>
+
+                <!-- Timetable grid: columns for Mon..Sun -->
+                <div id="scheduleTimetable" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-4">
+                    <!-- JS will populate one column per day here -->
+                </div>
+
+                <div class="mt-2 text-xs text-gray-400">
+                    Timetable is generated automatically from your schedule text. Edit the text above to update.
+                </div>
+            </div>
+
+
+            <div class="mt-3 text-sm text-gray-500">
+                Auto-saved ✔ Changes persist after refresh.
+            </div>
+        </section>
+
+        <!-- Progress Dashboard -->
+        <section>
+            <h2 class="text-xl font-semibold mb-6">📊 Progress Dashboard</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+
+
+                <!-- Weight Chart -->
+                <div class="bg-gray-800 p-4 rounded-xl shadow">
+                    <h3 class="text-sm text-gray-400 mb-2">Weight Progress (kg)</h3>
+                    <canvas id="weightChart"></canvas>
+                </div>
+
+                <!-- Gym Chart -->
+                <div class="bg-gray-800 p-4 rounded-xl shadow">
+                    <h3 class="text-sm text-gray-400 mb-2">Gym Sessions / Week</h3>
+                    <canvas id="gymChart"></canvas>
+                </div>
+
+                <!-- Study Chart -->
+                <div class="bg-gray-800 p-4 rounded-xl shadow">
+                    <h3 class="text-sm text-gray-400 mb-2">Study Hours / Week</h3>
+                    <canvas id="studyChart"></canvas>
+                </div>
+
+            </div>
+            <div class="bg-gray-800 p-4 rounded-xl shadow mt-4">
+                <h3 class="text-sm text-gray-400 mb-1">🔥 Current Streak</h3>
+                <p id="streakCount" class="text-3xl font-bold text-green-400">0</p>
+            </div>
+
+
+
+
+
+        </section>
+
+
+        <!-- Daily Habit Tracker -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">📅 Daily Habit Tracker</h2>
+
+            <div id="dailyTracker" class="space-y-3"></div>
+
+            <button onclick="addToday()"
+                class="mt-4 bg-green-500 hover:bg-green-600 text-black font-semibold px-4 py-2 rounded">
+                ➕ Add Today
+            </button>
+        </section>
+
+
+        <!-- Weekly Progress Tracker -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">📉 Weekly Progress Tracker</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-700 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-800 text-gray-300">
+                        <tr>
+                            <th class="p-3">Week</th>
+                            <th class="p-3">Weight (kg)</th>
+                            <th class="p-3">Waist (cm)</th>
+                            <th class="p-3">Gym Sessions</th>
+                            <th class="p-3">Study Hours</th>
+                            <th class="p-3">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weeklyTracker" class="divide-y divide-gray-700"></tbody>
+                </table>
+            </div>
+
+            <button onclick="addWeeklyRow()"
+                class="mt-4 bg-blue-500 hover:bg-blue-600 text-black font-semibold px-4 py-2 rounded">
+                ➕ Add Week
+            </button>
+        </section>
+
+        <div class="flex flex-wrap gap-3 mt-4">
+            <button onclick="exportData()" class="bg-purple-500 hover:bg-purple-600 text-black px-4 py-2 rounded">
+                ⬇ Export Data
+            </button>
+
+            <label class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded cursor-pointer">
+                ⬆ Import Data
+                <input type="file" hidden onchange="importData(event)">
+            </label>
+        </div>
+
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm pt-10">
+            Built with discipline 💪 | Stored locally in maddys browser
+        </footer>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        const dailyTracker = document.getElementById("dailyTracker");
+        const weeklyTracker = document.getElementById("weeklyTracker");
+
+        function createCell(value = "") {
+            const td = document.createElement("td");
+            td.className = "p-2";
+            const input = document.createElement("input");
+            input.value = value;
+            input.className =
+                "w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm";
+            td.appendChild(input);
+            return td;
+        }
+
+        function addDailyRow(data = {}) {
+            const tr = document.createElement("tr");
+            tr.appendChild(createCell(data.date));
+            tr.appendChild(createCell(data.workout));
+            tr.appendChild(createCell(data.calories));
+            tr.appendChild(createCell(data.protein));
+            tr.appendChild(createCell(data.study));
+            tr.appendChild(createCell(data.sleep));
+            dailyTracker.appendChild(tr);
+            saveData();
+        }
+
+        function addWeeklyRow(data = {}) {
+            const tr = document.createElement("tr");
+            tr.appendChild(createCell(data.week));
+            tr.appendChild(createCell(data.weight));
+            tr.appendChild(createCell(data.waist));
+            tr.appendChild(createCell(data.gym));
+            tr.appendChild(createCell(data.study));
+            tr.appendChild(createCell(data.notes));
+            weeklyTracker.appendChild(tr);
+            saveData();
+        }
+
+        function saveData() {
+            const dailyData = [...dailyTracker.children].map(row =>
+                [...row.children].map(td => td.firstChild.value)
+            );
+            const weeklyData = [...weeklyTracker.children].map(row =>
+                [...row.children].map(td => td.firstChild.value)
+            );
+            localStorage.setItem("dailyTracker", JSON.stringify(dailyData));
+            localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
+        }
+
+        function loadData() {
+            const dailyData = JSON.parse(localStorage.getItem("dailyTracker")) || [];
+            const weeklyData = JSON.parse(localStorage.getItem("weeklyTracker")) || [];
+
+            dailyData.forEach(d =>
+                addDailyRow({
+                    date: d[0], workout: d[1], calories: d[2],
+                    protein: d[3], study: d[4], sleep: d[5]
+                })
+            );
+
+            weeklyData.forEach(w =>
+                addWeeklyRow({
+                    week: w[0], weight: w[1], waist: w[2],
+                    gym: w[3], study: w[4], notes: w[5]
+                })
+            );
+        }
+
+        document.addEventListener("input", saveData);
+        loadData();
+    </script>
+
+    <script>
+        const dailyTrackerEl = document.getElementById("dailyTracker");
+
+        function todayISO() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function loadDailyData() {
+            return JSON.parse(localStorage.getItem("dailyTracker") || "[]");
+        }
+
+        function saveDailyData(data) {
+            localStorage.setItem("dailyTracker", JSON.stringify(data));
+        }
+
+        function addToday() {
+            const data = loadDailyData();
+            const today = todayISO();
+
+            if (data.some(d => d.date === today)) return;
+
+            data.push({
+                date: today,
+                workout: false,
+                calories: false,
+                protein: false,
+                study: false,
+                sleep: false
+            });
+
+            saveDailyData(data);
+            renderDailyTracker();
+        }
+
+        function updateDay(date, field, value) {
+            const data = loadDailyData();
+            const day = data.find(d => d.date === date);
+            if (!day) return;
+
+            day[field] = value;
+            saveDailyData(data);
+
+            calculateStreak();
+        }
+
+        function renderDailyTracker() {
+            dailyTrackerEl.innerHTML = "";
+            const data = loadDailyData().sort((a, b) => b.date.localeCompare(a.date));
+
+            data.forEach(d => {
+                const card = document.createElement("div");
+                card.className = "bg-gray-800 p-4 rounded-xl shadow";
+
+                card.innerHTML = `
+      <div class="flex justify-between items-center mb-3">
+        <div class="font-semibold">${d.date}</div>
       </div>
 
-      <button
-        onclick="addDailyRow()"
-        class="mt-4 bg-green-500 hover:bg-green-600 text-black font-semibold px-4 py-2 rounded"
-      >
-        ➕ Add Day
-      </button>
-    </section>
-
-    <!-- Weekly Progress Tracker -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">📉 Weekly Progress Tracker</h2>
-
-      <div class="overflow-x-auto">
-        <table class="w-full border border-gray-700 rounded-lg overflow-hidden">
-          <thead class="bg-gray-800 text-gray-300">
-            <tr>
-              <th class="p-3">Week</th>
-              <th class="p-3">Weight (kg)</th>
-              <th class="p-3">Waist (cm)</th>
-              <th class="p-3">Gym Sessions</th>
-              <th class="p-3">Study Hours</th>
-              <th class="p-3">Notes</th>
-            </tr>
-          </thead>
-          <tbody id="weeklyTracker" class="divide-y divide-gray-700"></tbody>
-        </table>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+        ${checkbox(d.date, "workout", "Workout", d.workout)}
+        ${checkbox(d.date, "calories", "Calories OK", d.calories)}
+        ${checkbox(d.date, "protein", "Protein OK", d.protein)}
+        ${checkbox(d.date, "study", "Study", d.study)}
+        ${checkbox(d.date, "sleep", "Sleep ≥7.5h", d.sleep)}
       </div>
+    `;
 
-      <button
-        onclick="addWeeklyRow()"
-        class="mt-4 bg-blue-500 hover:bg-blue-600 text-black font-semibold px-4 py-2 rounded"
-      >
-        ➕ Add Week
-      </button>
-    </section>
+                dailyTrackerEl.appendChild(card);
+            });
+        }
 
-    <!-- Footer -->
-    <footer class="text-center text-gray-500 text-sm pt-10">
-      Built with discipline 💪 | Stored locally in your browser
-    </footer>
+        function checkbox(date, field, label, checked) {
+            return `
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox"
+        ${checked ? "checked" : ""}
+        onchange="updateDay('${date}','${field}',this.checked)"
+        class="accent-green-500 w-4 h-4">
+      <span>${label}</span>
+    </label>
+  `;
+        }
 
-  </main>
+        // Initial load
+        window.addEventListener("load", renderDailyTracker);
+    </script>
 
-  <!-- JavaScript -->
-  <script>
-    const dailyTracker = document.getElementById("dailyTracker");
-    const weeklyTracker = document.getElementById("weeklyTracker");
+    <!-- Schedule Box -->
+    <script>
+        const scheduleBox = document.getElementById("scheduleBox");
 
-    function createCell(value = "") {
-      const td = document.createElement("td");
-      td.className = "p-2";
-      const input = document.createElement("input");
-      input.value = value;
-      input.className =
-        "w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm";
-      td.appendChild(input);
-      return td;
-    }
-
-    function addDailyRow(data = {}) {
-      const tr = document.createElement("tr");
-      tr.appendChild(createCell(data.date));
-      tr.appendChild(createCell(data.workout));
-      tr.appendChild(createCell(data.calories));
-      tr.appendChild(createCell(data.protein));
-      tr.appendChild(createCell(data.study));
-      tr.appendChild(createCell(data.sleep));
-      dailyTracker.appendChild(tr);
-      saveData();
-    }
-
-    function addWeeklyRow(data = {}) {
-      const tr = document.createElement("tr");
-      tr.appendChild(createCell(data.week));
-      tr.appendChild(createCell(data.weight));
-      tr.appendChild(createCell(data.waist));
-      tr.appendChild(createCell(data.gym));
-      tr.appendChild(createCell(data.study));
-      tr.appendChild(createCell(data.notes));
-      weeklyTracker.appendChild(tr);
-      saveData();
-    }
-
-    function saveData() {
-      const dailyData = [...dailyTracker.children].map(row =>
-        [...row.children].map(td => td.firstChild.value)
-      );
-      const weeklyData = [...weeklyTracker.children].map(row =>
-        [...row.children].map(td => td.firstChild.value)
-      );
-      localStorage.setItem("dailyTracker", JSON.stringify(dailyData));
-      localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
-    }
-
-    function loadData() {
-      const dailyData = JSON.parse(localStorage.getItem("dailyTracker")) || [];
-      const weeklyData = JSON.parse(localStorage.getItem("weeklyTracker")) || [];
-
-      dailyData.forEach(d =>
-        addDailyRow({
-          date: d[0], workout: d[1], calories: d[2],
-          protein: d[3], study: d[4], sleep: d[5]
-        })
-      );
-
-      weeklyData.forEach(w =>
-        addWeeklyRow({
-          week: w[0], weight: w[1], waist: w[2],
-          gym: w[3], study: w[4], notes: w[5]
-        })
-      );
-    }
-
-    document.addEventListener("input", saveData);
-    loadData();
-  </script>
-  <script>
-  const scheduleBox = document.getElementById("scheduleBox");
-
-  const DEFAULT_SCHEDULE = `
+        const DEFAULT_SCHEDULE = `
 WEEKDAY ROUTINE (MON–FRI)
 
 06:00 – Wake up + Water
@@ -242,19 +442,467 @@ Weekly Treat: 1 meal max
 Hydration: 3–4L/day
 `;
 
-  function loadSchedule() {
-    const saved = localStorage.getItem("mySchedule");
-    scheduleBox.value = saved ? saved : DEFAULT_SCHEDULE;
-  }
+        function loadSchedule() {
+            const saved = localStorage.getItem("mySchedule");
+            scheduleBox.value = saved ? saved : DEFAULT_SCHEDULE;
+        }
 
-  function saveSchedule() {
-    localStorage.setItem("mySchedule", scheduleBox.value);
-  }
+        function saveSchedule() {
+            localStorage.setItem("mySchedule", scheduleBox.value);
+        }
 
-  scheduleBox.addEventListener("input", saveSchedule);
-  loadSchedule();
-</script>
+        scheduleBox.addEventListener("input", saveSchedule);
+        loadSchedule();
+    </script>
+
+    <!-- Schedule Timetable -->
+    <script>
+        /* -------------------------
+          Schedule -> Timetable Renderer
+           - Parses the freeform text you've been using
+           - Groups events by day (MON..SUN)
+           - Sorts by start time and renders columns
+        ------------------------- */
+
+        const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+        const DAY_LABELS = { MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu', FRI: 'Fri', SAT: 'Sat', SUN: 'Sun' };
+
+        function parseDaysLine(line) {
+            // returns array of day tokens like ['MON','WED','FRI']
+            const up = line.toUpperCase();
+            // weekday/weekend shortcuts
+            if (/\bWEEKDAY\b/.test(up) || /MON\s*[–-]\s*FRI/.test(up) || /MON–FRI/.test(up)) {
+                return ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+            }
+            if (/\bWEEKEND\b/.test(up) || /SAT\s*[–-]\s*SUN/.test(up)) {
+                return ['SAT', 'SUN'];
+            }
+            // explicit list e.g. "MON / WED / FRI (Japanese Days)"
+            const found = [...up.matchAll(/\b(MON|TUE|WED|THU|FRI|SAT|SUN)\b/g)].map(m => m[1]);
+            if (found.length) return found;
+            // fallback: if line contains 'MON' etc anywhere inside parentheses
+            const parenMatch = up.match(/\(([^)]+)\)/);
+            if (parenMatch) {
+                const inner = parenMatch[1];
+                const f = [...inner.matchAll(/\b(MON|TUE|WED|THU|FRI|SAT|SUN)\b/g)].map(m => m[1]);
+                if (f.length) return f;
+            }
+            return [];
+        }
+
+        function timeToMinutes(t) {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function parseScheduleText(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length);
+            const scheduleByDay = { MON: [], TUE: [], WED: [], THU: [], FRI: [], SAT: [], SUN: [] };
+
+            let currentDays = [];
+
+            for (let raw of lines) {
+                // Skip headers that are clearly titles (like WORKOUT SPLIT or DIET TARGETS)
+                if (/^(WORKOUT|DIET|WEEK|DIET|PROTEIN|WEEKLY TREAT|HYDRATION)/i.test(raw)) {
+                    currentDays = []; // reset grouping
+                    continue;
+                }
+
+                const up = raw.toUpperCase();
+
+                // If line looks like a "days header" (contains day names or WEEKDAY/WEEKEND), set currentDays
+                if (/\b(MON|TUE|WED|THU|FRI|SAT|SUN|WEEKDAY|WEEKEND)\b/.test(up)) {
+                    const parsed = parseDaysLine(raw);
+                    if (parsed.length) {
+                        currentDays = parsed;
+                        continue;
+                    }
+                }
+
+                // Try range: "06:10 – 07:10 – Gym / Exercise (1 hr)" or "06:10 - 07:10 - Activity"
+                let m = raw.match(/^(\d{1,2}:\d{2})\s*[–\-to]{1,3}\s*(\d{1,2}:\d{2})\s*[-–—]?\s*(.+)$/i);
+                if (m) {
+                    const [_, start, end, rest] = m;
+                    const entry = { start, end, label: rest.trim() };
+                    (currentDays.length ? currentDays : ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']).forEach(d => {
+                        scheduleByDay[d].push({ ...entry, minutes: timeToMinutes(start) });
+                    });
+                    continue;
+                }
+
+                // Try single time: "06:00 – Wake up + Water" (start + label)
+                m = raw.match(/^(\d{1,2}:\d{2})\s*[–\-]\s*(.+)$/i);
+                if (m) {
+                    const [_, start, rest] = m;
+                    const entry = { start, end: null, label: rest.trim() };
+                    (currentDays.length ? currentDays : ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']).forEach(d => {
+                        scheduleByDay[d].push({ ...entry, minutes: timeToMinutes(start) });
+                    });
+                    continue;
+                }
+
+                // If we reach here, treat it as a miscellaneous line — put into all currentDays as a note
+                if (currentDays.length) {
+                    currentDays.forEach(d => scheduleByDay[d].push({ start: null, end: null, label: raw, minutes: 9999 }));
+                }
+            }
+
+            // sort events for each day
+            for (const d of Object.keys(scheduleByDay)) {
+                scheduleByDay[d].sort((a, b) => (a.minutes || 0) - (b.minutes || 0));
+            }
+
+            return scheduleByDay;
+        }
+
+        function renderTimetable(scheduleText) {
+            const target = document.getElementById('scheduleTimetable');
+            target.innerHTML = ''; // clear
+
+            const data = parseScheduleText(scheduleText);
+
+            // For responsive, create a column per day (Mon..Sun)
+            for (const d of DAYS) {
+                const col = document.createElement('div');
+                col.className = "bg-gray-800 p-3 rounded-lg shadow min-h-[120px]";
+
+                // header
+                const hd = document.createElement('div');
+                hd.className = "flex items-baseline justify-between mb-2";
+                hd.innerHTML = `<div class="text-sm font-semibold text-gray-200">${DAY_LABELS[d]}</div>
+                    <div class="text-xs text-gray-400">${data[d].length} items</div>`;
+                col.appendChild(hd);
+
+                // list of events
+                const list = document.createElement('div');
+                list.className = "space-y-2 text-sm";
+
+                if (data[d].length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = "text-xs text-gray-400";
+                    empty.textContent = '—';
+                    list.appendChild(empty);
+                } else {
+                    data[d].forEach(ev => {
+                        const row = document.createElement('div');
+                        row.className = "p-2 bg-gray-900 rounded flex flex-col";
+                        const timeText = ev.start ? (ev.end ? `${ev.start} → ${ev.end}` : `${ev.start}`) : '';
+                        const t = document.createElement('div');
+                        t.className = "text-xs text-green-300 font-medium";
+                        t.textContent = timeText;
+
+                        const lab = document.createElement('div');
+                        lab.className = "text-sm text-gray-200";
+                        lab.textContent = ev.label;
+
+                        row.appendChild(t);
+                        row.appendChild(lab);
+                        list.appendChild(row);
+                    });
+                }
+
+                col.appendChild(list);
+                target.appendChild(col);
+            }
+        }
+
+        /* Wire up to textarea input */
+        function setupScheduleTimetable() {
+            // initial render
+            renderTimetable(scheduleBox.value || '');
+
+            // update live as user types (but debounce a little)
+            let t;
+            scheduleBox.addEventListener('input', () => {
+                saveSchedule();
+                clearTimeout(t);
+                t = setTimeout(() => renderTimetable(scheduleBox.value), 200);
+            });
+        }
+
+        // run on load
+        window.addEventListener('load', setupScheduleTimetable);
+    </script>
+
+    <!-- extract weekly data -->
+    <script>
+        let weightChart, gymChart, studyChart;
+
+        function extractWeeklyData() {
+            const rows = [...weeklyTracker.children];
+
+            const weeks = [];
+            const weights = [];
+            const gymSessions = [];
+            const studyHours = [];
+
+            rows.forEach(row => {
+                const cells = [...row.children].map(td => td.firstChild.value);
+                if (!cells[0]) return;
+
+                weeks.push(cells[0]);
+                weights.push(Number(cells[1]) || 0);
+                gymSessions.push(Number(cells[3]) || 0);
+                studyHours.push(Number(cells[4]) || 0);
+            });
+
+            return { weeks, weights, gymSessions, studyHours };
+        }
+
+        function renderCharts() {
+            const { weeks, weights, gymSessions, studyHours } = extractWeeklyData();
+
+            if (weightChart) weightChart.destroy();
+            if (gymChart) gymChart.destroy();
+            if (studyChart) studyChart.destroy();
+
+            weightChart = new Chart(document.getElementById("weightChart"), {
+                type: "line",
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: "Weight (kg)",
+                        data: weights,
+                        borderColor: "#22c55e",
+                        backgroundColor: "rgba(34,197,94,0.2)",
+                        tension: 0.3
+                    }]
+                }
+            });
+
+            gymChart = new Chart(document.getElementById("gymChart"), {
+                type: "bar",
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: "Gym Sessions",
+                        data: gymSessions,
+                        backgroundColor: "#3b82f6"
+                    }]
+                }
+            });
+
+            studyChart = new Chart(document.getElementById("studyChart"), {
+                type: "bar",
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: "Study Hours",
+                        data: studyHours,
+                        backgroundColor: "#facc15"
+                    }]
+                }
+            });
+        }
+
+        document.addEventListener("input", () => {
+            saveData();
+            renderCharts();
+        });
+
+        window.addEventListener("load", renderCharts);
+    </script>
+
+    <!-- Export/Import Data -->
+    <script>
+        function exportData() {
+            const data = {
+                schedule: localStorage.getItem("mySchedule"),
+                daily: JSON.parse(localStorage.getItem("dailyTracker") || "[]"),
+                weekly: JSON.parse(localStorage.getItem("weeklyTracker") || "[]")
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+                type: "application/json"
+            });
+
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "maddys-growth-tracker-backup.json";
+            a.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                const data = JSON.parse(e.target.result);
+
+                localStorage.setItem("mySchedule", data.schedule || "");
+                localStorage.setItem("dailyTracker", JSON.stringify(data.daily || []));
+                localStorage.setItem("weeklyTracker", JSON.stringify(data.weekly || []));
+
+                location.reload();
+            };
+            reader.readAsText(file);
+        }
+    </script>
+
+    <!-- Streak Calculation -->
+    <script>
+        function calculateStreak() {
+            const data = JSON.parse(localStorage.getItem("dailyTracker") || "[]");
+            let streak = 0;
+
+            for (let i = data.length - 1; i >= 0; i--) {
+                const d = data[i];
+                if (d.workout || d.study) streak++;
+                else break;
+            }
+
+            document.getElementById("streakCount").textContent = streak;
+        }
+
+        window.addEventListener("load", calculateStreak);
+    </script>
+
+    <!-- Dynamic header -->
+
+    <script>
+        /* Dynamic header / profile widget */
+
+        // defaults (you can change)
+        const DEFAULT_PROFILE = {
+            name: "Maddy",
+            heightCm: 164,
+            goalWeightKg: 85,
+            preferUnit: "kg"
+        };
+
+        function getProfile() {
+            try {
+                return JSON.parse(localStorage.getItem("profile") || JSON.stringify(DEFAULT_PROFILE));
+            } catch (e) {
+                return DEFAULT_PROFILE;
+            }
+        }
+
+        function saveProfile(p) {
+            localStorage.setItem("profile", JSON.stringify(p));
+        }
+
+        // read latest weight from weeklyTracker (localStorage format: array of rows)
+        function getLatestWeightFromWeekly() {
+            const weekly = JSON.parse(localStorage.getItem("weeklyTracker") || "[]");
+            // rows are arrays; weight is at index 1
+            for (let i = weekly.length - 1; i >= 0; i--) {
+                const w = parseFloat(weekly[i][1]);
+                if (!isNaN(w) && w > 0) return w;
+            }
+            return null;
+        }
+
+        // get start weight (first non-empty weekly weight)
+        function getStartWeightFromWeekly() {
+            const weekly = JSON.parse(localStorage.getItem("weeklyTracker") || "[]");
+            for (let i = 0; i < weekly.length; i++) {
+                const w = parseFloat(weekly[i][1]);
+                if (!isNaN(w) && w > 0) return w;
+            }
+            return null;
+        }
+
+        function updateHeader() {
+            const profile = getProfile();
+            const latestWeight = getLatestWeightFromWeekly();
+            const startWeight = getStartWeightFromWeekly() ?? profile.startWeightKg ?? null;
+            const currentWeight = latestWeight ?? profile.currentWeightKg ?? null;
+
+            // name
+            document.getElementById("profileName").textContent = profile.name || "You";
+
+            // current & goal
+            document.getElementById("goalWeight").textContent = (profile.goalWeightKg || DEFAULT_PROFILE.goalWeightKg) + " kg";
+            document.getElementById("currentWeight").textContent = currentWeight ? `${currentWeight} kg` : "-- kg";
+
+            // delta from start
+            if (startWeight && currentWeight) {
+                const delta = (currentWeight - startWeight).toFixed(1);
+                const sign = delta > 0 ? "+" : "";
+                document.getElementById("weightDelta").textContent = `from ${startWeight} kg (${sign}${delta} kg)`;
+            } else {
+                document.getElementById("weightDelta").textContent = `from --`;
+            }
+
+            // BMI
+            const heightM = (profile.heightCm || DEFAULT_PROFILE.heightCm) / 100;
+            const bmi = (currentWeight && heightM) ? (currentWeight / (heightM * heightM)).toFixed(1) : "--";
+            document.getElementById("bmiLabel").textContent = `BMI: ${bmi}`;
+
+            // progress: if startWeight -> goalWeight -> currentWeight calculation
+            const g = profile.goalWeightKg || DEFAULT_PROFILE.goalWeightKg;
+            if (startWeight && g && startWeight !== g && currentWeight) {
+                // progress 0% at startWeight -> 100% at goalWeight (handles reduction or gain)
+                const total = Math.abs(startWeight - g);
+                const done = Math.abs(startWeight - currentWeight);
+                let pct = Math.round((done / total) * 100);
+                if (pct < 0) pct = 0;
+                if (pct > 100) pct = 100;
+                document.getElementById("progressBar").style.width = pct + "%";
+            } else {
+                document.getElementById("progressBar").style.width = "0%";
+            }
+        }
+
+        // show/hide profile editor
+        const editBtn = document.getElementById("editProfileBtn");
+        const editPanel = document.getElementById("profileEdit");
+        const inpName = document.getElementById("inpName");
+        const inpHeight = document.getElementById("inpHeight");
+        const inpGoal = document.getElementById("inpGoal");
+        const saveBtn = document.getElementById("saveProfileBtn");
+        const cancelBtn = document.getElementById("cancelProfileBtn");
+
+        function openProfileEditor() {
+            const p = getProfile();
+            inpName.value = p.name || "";
+            inpHeight.value = p.heightCm || "";
+            inpGoal.value = p.goalWeightKg || "";
+            editPanel.classList.remove("hidden");
+            inpName.focus();
+        }
+
+        function closeProfileEditor() {
+            editPanel.classList.add("hidden");
+        }
+
+        editBtn.addEventListener("click", () => {
+            if (editPanel.classList.contains("hidden")) openProfileEditor();
+            else closeProfileEditor();
+        });
+
+        saveBtn.addEventListener("click", () => {
+            const p = getProfile();
+            p.name = inpName.value || p.name;
+            p.heightCm = Number(inpHeight.value) || p.heightCm;
+            p.goalWeightKg = Number(inpGoal.value) || p.goalWeightKg;
+            saveProfile(p);
+            updateHeader();
+            closeProfileEditor();
+        });
+
+        cancelBtn.addEventListener("click", () => {
+            closeProfileEditor();
+        });
+
+        // update header when weekly or daily changes
+        document.addEventListener("input", () => {
+            // small debounce / microtask safe
+            setTimeout(updateHeader, 50);
+        });
+
+        // initial load
+        window.addEventListener("load", () => {
+            // ensure profile exists
+            if (!localStorage.getItem("profile")) saveProfile(DEFAULT_PROFILE);
+
+            updateHeader();
+        });
+    </script>
 
 
 </body>
+
 </html>
