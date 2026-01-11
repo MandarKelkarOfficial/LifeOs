@@ -33,51 +33,94 @@
 
     <!-- Header -->
     <header class="bg-gray-800 shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+            <!-- Title -->
             <div>
-                <h1 class="text-2xl font-bold text-green-400">
+                <h1 class="text-xl md:text-2xl font-bold text-green-400">
                     🚀 6-Month Fitness & Study Tracker
                 </h1>
-                <p class="text-sm text-gray-400">
+                <p class="text-xs md:text-sm text-gray-400">
                     Jan – June | Gym • Diet • Study • Discipline
                 </p>
             </div>
 
             <!-- Profile / Progress card -->
-            <div id="profileCard" class="bg-gray-900 border border-gray-700 rounded-lg p-3 flex items-center gap-4">
-                <div class="min-w-[140px]">
+            <div id="profileCard" class="bg-gray-900 border border-gray-700 rounded-lg p-3
+             grid grid-cols-3 gap-3
+             md:flex md:items-center md:gap-4">
+
+                <!-- Name -->
+                <div class="min-w-0">
                     <div class="text-xs text-gray-400">Name</div>
-                    <div id="profileName" class="font-semibold text-white">Maddy</div>
+                    <div id="profileName" class="font-semibold text-white truncate">
+                        Maddy
+                    </div>
                 </div>
 
-                <div class="min-w-[120px]">
+                <!-- Current weight -->
+                <div class="min-w-0">
                     <div class="text-xs text-gray-400">Current</div>
-                    <div class="font-semibold text-green-400" id="currentWeight">-- kg</div>
-                    <div class="text-xs text-gray-400" id="weightDelta">from --</div>
+                    <div class="font-semibold text-green-400" id="currentWeight">
+                        -- kg
+                    </div>
+                    <div class="text-[11px] text-gray-400" id="weightDelta">
+                        from --
+                    </div>
                 </div>
 
-                <div class="min-w-[140px]">
+                <!-- Goal -->
+                <div class="min-w-0">
                     <div class="text-xs text-gray-400">Goal</div>
                     <div class="flex items-center gap-2">
                         <div class="font-semibold" id="goalWeight">-- kg</div>
                         <button id="editProfileBtn"
-                            class="text-xs px-2 py-1 bg-gray-800 rounded text-gray-300 hover:bg-gray-700">Edit</button>
+                            class="text-[11px] px-2 py-0.5 bg-gray-800 rounded text-gray-300 hover:bg-gray-700">
+                            Edit
+                        </button>
                     </div>
-                    <div class="text-xs text-gray-400" id="bmiLabel">BMI: --</div>
+                    <div class="text-[11px] text-gray-400" id="bmiLabel">
+                        BMI: --
+                    </div>
                 </div>
 
-                <div class="flex-1">
-                    <div class="text-xs text-gray-400">Progress to goal</div>
-                    <div class="w-full bg-gray-800 rounded-full h-2 mt-1 overflow-hidden">
-                        <div id="progressBar" class="h-2 bg-green-400 rounded-full" style="width:0%"></div>
+                <!-- Progress bar (full width on mobile) -->
+                <!-- Progress Ring -->
+                <div class="col-span-2 md:col-span-1 flex items-center gap-3">
+                    <div class="relative w-14 h-14">
+                        <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
+                            <!-- Background circle -->
+                            <path d="M18 2.0845
+           a 15.9155 15.9155 0 0 1 0 31.831
+           a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#1f2937" stroke-width="3" />
+
+                            <!-- Progress circle -->
+                            <path id="progressRing" d="M18 2.0845
+           a 15.9155 15.9155 0 0 1 0 31.831
+           a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="0, 100"
+                                stroke-linecap="round" class="transition-all duration-500" />
+                        </svg>
+
+                        <!-- Percentage text -->
+                        <div id="progressText"
+                            class="absolute inset-0 flex items-center justify-center text-xs font-semibold text-green-400">
+                            0%
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-gray-400 leading-tight">
+                        Progress<br />to goal
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Inline edit form (hidden by default) -->
-        <div id="profileEdit" class="max-w-7xl mx-auto px-6 py-3 hidden">
-            <div class="bg-gray-800 p-4 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+        <!-- Inline edit form -->
+        <div id="profileEdit" class="max-w-7xl mx-auto px-4 py-3 hidden">
+            <div class="bg-gray-800 p-4 rounded-lg
+             grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 items-end">
+
                 <div>
                     <label class="text-xs text-gray-400">Name</label>
                     <input id="inpName" class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm"
@@ -97,15 +140,16 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button id="saveProfileBtn"
-                        class="bg-green-500 hover:bg-green-600 text-black px-3 py-1 rounded">Save</button>
-                    <button id="cancelProfileBtn"
-                        class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1 rounded">Cancel</button>
+                    <button id="saveProfileBtn" class="bg-green-500 hover:bg-green-600 text-black px-3 py-1 rounded">
+                        Save
+                    </button>
+                    <button id="cancelProfileBtn" class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1 rounded">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
     </header>
-
 
     <!-- Main -->
     <main class="max-w-7xl mx-auto px-7 py-8 space-y-12">
@@ -212,7 +256,7 @@
                 </table>
             </div>
 
-           
+
         </section>
 
         <div class="flex flex-wrap gap-3 mt-4">
@@ -688,14 +732,14 @@ Hydration: 3–4L/day
         /* Dynamic header / profile widget */
 
         // defaults (you can change)
-       const DEFAULT_PROFILE = {
-  name: "Maddy",
-  heightCm: 164,
-  goalWeightKg: 85,
-  startWeightKg: 95,     
-  currentWeightKg: 95,   
-  preferUnit: "kg"
-};
+        const DEFAULT_PROFILE = {
+            name: "Maddy",
+            heightCm: 164,
+            goalWeightKg: 85,
+            startWeightKg: 95,
+            currentWeightKg: 95,
+            preferUnit: "kg"
+        };
 
 
         function getProfile() {
@@ -767,7 +811,15 @@ Hydration: 3–4L/day
                 let pct = Math.round((done / total) * 100);
                 if (pct < 0) pct = 0;
                 if (pct > 100) pct = 100;
-                document.getElementById("progressBar").style.width = pct + "%";
+                const ring = document.getElementById("progressRing");
+                const text = document.getElementById("progressText");
+
+                if (ring && text) {
+                    ring.setAttribute("stroke-dasharray", `${pct}, 100`);
+                    text.textContent = `${pct}%`;
+                }
+
+
             } else {
                 document.getElementById("progressBar").style.width = "0%";
             }
@@ -879,7 +931,7 @@ Hydration: 3–4L/day
             localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
 
             // Re-render weekly table & charts
-   location.reload(); // simplest & safest re-render
+            location.reload(); // simplest & safest re-render
 
 
             renderCharts();
