@@ -108,7 +108,7 @@
 
 
     <!-- Main -->
-    <main class="max-w-8xl mx-auto px-7 py-8 space-y-12">
+    <main class="max-w-7xl mx-auto px-7 py-8 space-y-12">
 
         <!-- Fixed Schedule -->
         <section>
@@ -237,79 +237,7 @@
 
     </main>
 
-    <!-- JavaScript -->
-    <script>
-        const dailyTracker = document.getElementById("dailyTracker");
-        const weeklyTracker = document.getElementById("weeklyTracker");
 
-        function createCell(value = "") {
-            const td = document.createElement("td");
-            td.className = "p-2";
-            const input = document.createElement("input");
-            input.value = value;
-            input.className =
-                "w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm";
-            td.appendChild(input);
-            return td;
-        }
-
-        function addDailyRow(data = {}) {
-            const tr = document.createElement("tr");
-            tr.appendChild(createCell(data.date));
-            tr.appendChild(createCell(data.workout));
-            tr.appendChild(createCell(data.calories));
-            tr.appendChild(createCell(data.protein));
-            tr.appendChild(createCell(data.study));
-            tr.appendChild(createCell(data.sleep));
-            dailyTracker.appendChild(tr);
-            saveData();
-        }
-
-        function addWeeklyRow(data = {}) {
-            const tr = document.createElement("tr");
-            tr.appendChild(createCell(data.week));
-            tr.appendChild(createCell(data.weight));
-            tr.appendChild(createCell(data.waist));
-            tr.appendChild(createCell(data.gym));
-            tr.appendChild(createCell(data.study));
-            tr.appendChild(createCell(data.notes));
-            weeklyTracker.appendChild(tr);
-            saveData();
-        }
-
-        function saveData() {
-            const dailyData = [...dailyTracker.children].map(row =>
-                [...row.children].map(td => td.firstChild.value)
-            );
-            const weeklyData = [...weeklyTracker.children].map(row =>
-                [...row.children].map(td => td.firstChild.value)
-            );
-            localStorage.setItem("dailyTracker", JSON.stringify(dailyData));
-            localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
-        }
-
-        function loadData() {
-            const dailyData = JSON.parse(localStorage.getItem("dailyTracker")) || [];
-            const weeklyData = JSON.parse(localStorage.getItem("weeklyTracker")) || [];
-
-            dailyData.forEach(d =>
-                addDailyRow({
-                    date: d[0], workout: d[1], calories: d[2],
-                    protein: d[3], study: d[4], sleep: d[5]
-                })
-            );
-
-            weeklyData.forEach(w =>
-                addWeeklyRow({
-                    week: w[0], weight: w[1], waist: w[2],
-                    gym: w[3], study: w[4], notes: w[5]
-                })
-            );
-        }
-
-        document.addEventListener("input", saveData);
-        loadData();
-    </script>
 
     <script>
         const dailyTrackerEl = document.getElementById("dailyTracker");
@@ -696,7 +624,6 @@ Hydration: 3–4L/day
         }
 
         document.addEventListener("input", () => {
-            saveData();
             renderCharts();
         });
 
@@ -900,6 +827,73 @@ Hydration: 3–4L/day
 
             updateHeader();
         });
+    </script>
+
+    <script>
+        function getWeekKey(dateStr) {
+            const d = new Date(dateStr);
+            const year = d.getFullYear();
+            const week = Math.ceil(
+                (((d - new Date(year, 0, 1)) / 86400000) + new Date(year, 0, 1).getDay() + 1) / 7
+            );
+            return `${year}-W${week}`;
+        }
+    </script>
+
+
+    <script>
+        function autoGenerateWeeklySummary() {
+            const today = new Date();
+            const isSunday = today.getDay() === 0; // Sunday = 0
+
+            if (!isSunday) return;
+
+            const dailyData = JSON.parse(localStorage.getItem("dailyTracker") || "[]");
+            if (!dailyData.length) return;
+
+            const currentWeekKey = getWeekKey(today.toISOString().slice(0, 10));
+
+            const weeklyData = JSON.parse(localStorage.getItem("weeklyTracker") || "[]");
+
+            // Prevent duplicate auto rows
+            if (weeklyData.some(w => w[0] === currentWeekKey)) return;
+
+            // Filter daily entries for this week
+            const weekEntries = dailyData.filter(d => getWeekKey(d.date) === currentWeekKey);
+
+            if (!weekEntries.length) return;
+
+            const gymSessions = weekEntries.filter(d => d.workout).length;
+            const studyHours = weekEntries.filter(d => d.study).length; // 1 day = 1 unit
+
+            const newWeeklyRow = [
+                currentWeekKey, // Week
+                "",              // Weight (manual)
+                "",              // Waist (manual)
+                gymSessions,
+                studyHours,
+                "Auto-generated from daily habits"
+            ];
+
+            weeklyData.push(newWeeklyRow);
+            localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
+
+            // Re-render weekly table & charts
+            addWeeklyRow({
+                week: newWeeklyRow[0],
+                weight: "",
+                waist: "",
+                gym: gymSessions,
+                study: studyHours,
+                notes: newWeeklyRow[5]
+            });
+
+            renderCharts();
+            updateHeader();
+        }
+    </script>
+    <script>
+        window.addEventListener("load", autoGenerateWeeklySummary);
     </script>
 
 
