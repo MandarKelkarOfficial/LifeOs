@@ -212,10 +212,7 @@
                 </table>
             </div>
 
-            <button onclick="addWeeklyRow()"
-                class="mt-4 bg-blue-500 hover:bg-blue-600 text-black font-semibold px-4 py-2 rounded">
-                ➕ Add Week
-            </button>
+           
         </section>
 
         <div class="flex flex-wrap gap-3 mt-4">
@@ -691,12 +688,15 @@ Hydration: 3–4L/day
         /* Dynamic header / profile widget */
 
         // defaults (you can change)
-        const DEFAULT_PROFILE = {
-            name: "Maddy",
-            heightCm: 164,
-            goalWeightKg: 85,
-            preferUnit: "kg"
-        };
+       const DEFAULT_PROFILE = {
+  name: "Maddy",
+  heightCm: 164,
+  goalWeightKg: 85,
+  startWeightKg: 95,     
+  currentWeightKg: 95,   
+  preferUnit: "kg"
+};
+
 
         function getProfile() {
             try {
@@ -879,14 +879,8 @@ Hydration: 3–4L/day
             localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
 
             // Re-render weekly table & charts
-            addWeeklyRow({
-                week: newWeeklyRow[0],
-                weight: "",
-                waist: "",
-                gym: gymSessions,
-                study: studyHours,
-                notes: newWeeklyRow[5]
-            });
+   location.reload(); // simplest & safest re-render
+
 
             renderCharts();
             updateHeader();
