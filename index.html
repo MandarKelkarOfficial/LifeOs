@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6-Month Growth Tracker</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-900 text-gray-100 font-inter min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-gray-800 shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <h1 class="text-2xl font-bold text-green-400">
+        🚀 6-Month Fitness & Study Tracker
+      </h1>
+      <p class="text-sm text-gray-400">
+        Jan – June | Gym • Diet • Study • Discipline
+      </p>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+
+<!-- Fixed Schedule -->
+<section>
+  <h2 class="text-xl font-semibold mb-4">🗓️ My Fixed Schedule</h2>
+
+  <p class="text-gray-400 text-sm mb-2">
+    Editable schedule (stored locally like a text database)
+  </p>
+
+  <textarea
+    id="scheduleBox"
+    rows="16"
+    class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500"
+  ></textarea>
+
+  <div class="mt-3 text-sm text-gray-500">
+    Auto-saved ✔ Changes persist after refresh.
+  </div>
+</section>
+
+
+    <!-- Daily Habit Tracker -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">📅 Daily Habit Tracker</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-700 rounded-lg overflow-hidden">
+          <thead class="bg-gray-800 text-gray-300">
+            <tr>
+              <th class="p-3">Date</th>
+              <th class="p-3">Workout</th>
+              <th class="p-3">Calories (~2100)</th>
+              <th class="p-3">Protein (~160g)</th>
+              <th class="p-3">Study</th>
+              <th class="p-3">Sleep ≥7.5h</th>
+            </tr>
+          </thead>
+          <tbody id="dailyTracker" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+
+      <button
+        onclick="addDailyRow()"
+        class="mt-4 bg-green-500 hover:bg-green-600 text-black font-semibold px-4 py-2 rounded"
+      >
+        ➕ Add Day
+      </button>
+    </section>
+
+    <!-- Weekly Progress Tracker -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">📉 Weekly Progress Tracker</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-700 rounded-lg overflow-hidden">
+          <thead class="bg-gray-800 text-gray-300">
+            <tr>
+              <th class="p-3">Week</th>
+              <th class="p-3">Weight (kg)</th>
+              <th class="p-3">Waist (cm)</th>
+              <th class="p-3">Gym Sessions</th>
+              <th class="p-3">Study Hours</th>
+              <th class="p-3">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTracker" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+
+      <button
+        onclick="addWeeklyRow()"
+        class="mt-4 bg-blue-500 hover:bg-blue-600 text-black font-semibold px-4 py-2 rounded"
+      >
+        ➕ Add Week
+      </button>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-500 text-sm pt-10">
+      Built with discipline 💪 | Stored locally in your browser
+    </footer>
+
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    const dailyTracker = document.getElementById("dailyTracker");
+    const weeklyTracker = document.getElementById("weeklyTracker");
+
+    function createCell(value = "") {
+      const td = document.createElement("td");
+      td.className = "p-2";
+      const input = document.createElement("input");
+      input.value = value;
+      input.className =
+        "w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm";
+      td.appendChild(input);
+      return td;
+    }
+
+    function addDailyRow(data = {}) {
+      const tr = document.createElement("tr");
+      tr.appendChild(createCell(data.date));
+      tr.appendChild(createCell(data.workout));
+      tr.appendChild(createCell(data.calories));
+      tr.appendChild(createCell(data.protein));
+      tr.appendChild(createCell(data.study));
+      tr.appendChild(createCell(data.sleep));
+      dailyTracker.appendChild(tr);
+      saveData();
+    }
+
+    function addWeeklyRow(data = {}) {
+      const tr = document.createElement("tr");
+      tr.appendChild(createCell(data.week));
+      tr.appendChild(createCell(data.weight));
+      tr.appendChild(createCell(data.waist));
+      tr.appendChild(createCell(data.gym));
+      tr.appendChild(createCell(data.study));
+      tr.appendChild(createCell(data.notes));
+      weeklyTracker.appendChild(tr);
+      saveData();
+    }
+
+    function saveData() {
+      const dailyData = [...dailyTracker.children].map(row =>
+        [...row.children].map(td => td.firstChild.value)
+      );
+      const weeklyData = [...weeklyTracker.children].map(row =>
+        [...row.children].map(td => td.firstChild.value)
+      );
+      localStorage.setItem("dailyTracker", JSON.stringify(dailyData));
+      localStorage.setItem("weeklyTracker", JSON.stringify(weeklyData));
+    }
+
+    function loadData() {
+      const dailyData = JSON.parse(localStorage.getItem("dailyTracker")) || [];
+      const weeklyData = JSON.parse(localStorage.getItem("weeklyTracker")) || [];
+
+      dailyData.forEach(d =>
+        addDailyRow({
+          date: d[0], workout: d[1], calories: d[2],
+          protein: d[3], study: d[4], sleep: d[5]
+        })
+      );
+
+      weeklyData.forEach(w =>
+        addWeeklyRow({
+          week: w[0], weight: w[1], waist: w[2],
+          gym: w[3], study: w[4], notes: w[5]
+        })
+      );
+    }
+
+    document.addEventListener("input", saveData);
+    loadData();
+  </script>
+  <script>
+  const scheduleBox = document.getElementById("scheduleBox");
+
+  const DEFAULT_SCHEDULE = `
+WEEKDAY ROUTINE (MON–FRI)
+
+06:00 – Wake up + Water
+06:10 – 07:10 – Gym / Exercise (1 hr)
+07:10 – 07:30 – Shower + Breakfast
+07:30 – 18:00 – Internship (FIXED)
+
+MON / WED / FRI (Japanese Days)
+18:00 – 18:25 – Snack + Rest
+18:30 – 20:30 – Japanese Class
+20:30 – 21:00 – Dinner (Light)
+21:00 – 22:00 – Study / Revision
+22:30 – Sleep
+
+TUE / THU (Deep Focus Days)
+18:30 – 20:00 – Deep Study (Math / English)
+20:00 – 20:30 – Dinner
+20:30 – 22:00 – Project / Coding
+22:30 – Sleep
+
+
+WORKOUT SPLIT
+Mon – Upper Body
+Tue – Lower Body
+Wed – Cardio + Core
+Thu – Back + Biceps
+Fri – Full Body
+Sat – Cardio / Sports
+Sun – Mobility / Yoga
+
+
+DIET TARGETS
+Calories: ~2100 kcal
+Protein: ~160 g/day
+
+Weekly Treat: 1 meal max
+Hydration: 3–4L/day
+`;
+
+  function loadSchedule() {
+    const saved = localStorage.getItem("mySchedule");
+    scheduleBox.value = saved ? saved : DEFAULT_SCHEDULE;
+  }
+
+  function saveSchedule() {
+    localStorage.setItem("mySchedule", scheduleBox.value);
+  }
+
+  scheduleBox.addEventListener("input", saveSchedule);
+  loadSchedule();
+</script>
+
+
+</body>
+</html>
